@@ -1,48 +1,17 @@
 $( document ).ready(function() {
 
 	var Navigation =  {
-		numColumns: 2,
-		numRows: 3,
-		posVertical: 1, // set starting pos
+		numColumns: 6,
+		numRows: 5,
 		posHorizontal: 1,
+		posVertical: 1, 
 
 		init: function() {
 			// activate nav items that are clickable
 			this.checkConstraints();
 
-			// makes sure we always start in the left top corner
+			// makes sure we always start with the posVertical and posHorizontal specified - provides flexibility + workaround refresh
 			this.moveTo();
-		},
-
-		checkConstraints: function(){
-			var $up =  $('#up'),
-				 $down = $('#down'),
-				 $left = $('#left'),
-				 $right = $('#right');
-
-			if ( this.posVertical <= 1 ) {
-				$up.addClass('inactive');
-			} else if( $up.hasClass('inactive') ){
-				$up.removeClass('inactive')
-			} 
-
-			if ( this.posVertical >= this.numRows ){
-				$down.addClass('inactive');
-			}else if ($down.hasClass('inactive') ) {
-				$down.removeClass('inactive');
-			}
-
-			if ( this.posHorizontal <= 1 ) {
-				$left.addClass('inactive');
-			} else if( $left.hasClass('inactive') ){
-				$left.removeClass('inactive')
-			} 
-
-			if ( this.posHorizontal >= this.numColumns ) {
-				$right.addClass('inactive');
-			} else if( $right.hasClass('inactive' ) ){
-				$right.removeClass('inactive')
-			} 		
 		},
 
 		update: function() {
@@ -54,7 +23,26 @@ $( document ).ready(function() {
 			var prevSlide = $('article.active')[0] || false;
 			$(prevSlide).removeClass('active');
 
-			Navigation.moveTo();
+			Navigation.moveTo( target );
+			
+		},
+
+		moveTo: function( el ){
+			var target = el || $("section[data-column='" + this.posHorizontal +"']").find("article[data-slide-id='" + this.posVertical +"']");
+			Navigation.setContent( target[0] );
+
+			target.addClass('active');
+			$('html').animate({ 
+							scrollTop: target.offset().top, 
+							scrollLeft: target.offset().left, 
+						},'slow');
+		},
+
+		setContent: function( el ) {
+			var contentAttribute = el.getAttribute( 'data-content' ) || false;
+			if ( contentAttribute ) {
+				Content.setContent( contentAttribute, el );
+			}
 		},
 
 		onClick: function( e ) {
@@ -62,7 +50,6 @@ $( document ).ready(function() {
 			e.preventDefault();
 
 			Navigation.updatePos(e.target.id);
-			Navigation.update();
 		},
 
 		onKeyDown: function( e ) {
@@ -87,105 +74,129 @@ $( document ).ready(function() {
 			}	 
 
 			Navigation.updatePos(pressed);
-			Navigation.update();
-		},
-
-		moveTo: function(  ){
-
-			var target = $("section[data-column='" + this.posHorizontal +"']").find("article[data-slide-id='" + this.posVertical +"']");
-
-			target.addClass('active');
-			$('body').animate({ 
-							scrollTop: target.offset().top, 
-							scrollLeft: target.offset().left, 
-						},'slow');
 		},
 
 		updatePos: function( direction ) {
 			switch( direction ) {
 				case 'down':
-					if (this.posVertical < this.numRows) this.posVertical++;
+					if (this.posVertical === this.numRows) return false;
+						this.posVertical++;
 					break;
 				case 'up':
-					if (this.posVertical !== 0 ) this.posVertical--;
+					if (this.posVertical === 1 ) return false;
+						this.posVertical--;
 					break;
 				case 'left':
-					if (this.posHorizontal !== 0 ) this.posHorizontal--;
+					if (this.posHorizontal === 1 ) return false;
+						this.posHorizontal--;
 					break;
 				case 'right':
-					if (this.posHorizontal < this.numColumns ) this.posHorizontal++;
+					if (this.posHorizontal === this.numColumns ) return false;
+						this.posHorizontal++;
 					break;
 				default:
-				console.log('Update Movement: doing nothing');
+				console.log('Pressed a key that does nothing');
 				break;
 			}
+
 			Navigation.checkConstraints();
+			Navigation.update();
+		},
+
+		checkConditions: function( el, condition ){
+			if ( condition ){
+				el.addClass('inactive');
+			} else if (el.hasClass('inactive')) {
+				el.removeClass('inactive');
+			}
+		},
+
+		checkConstraints: function(){
+			// this can go a bit backward, it checks them all eventhough you sometimes only want to check one
+			var $up =  $('#up'),
+				 $down = $('#down'),
+				 $left = $('#left'),
+				 $right = $('#right');
+
+			this.checkConditions( $up, this.posVertical <= 1 );
+			this.checkConditions( $down, this.posVertical >= this.numRows );
+			this.checkConditions( $left, this.posHorizontal <= 1  );
+			this.checkConditions( $right, this.posHorizontal >= this.numColumns );	
 		}
 	}
 
 	var Content = {
-		update: function() {
+
+		loaded: [],
+
+		setContent: function( type, container ) {
+			// saving current type so that next time it does not load it again
+			var gridNum = Navigation.posHorizontal * Navigation.posVertical;
+			if ( !this.loaded.indexOf( gridNum ) ) return false;
+			
+			this.loaded.push( gridNum );
+
+			var url,
+				 data;
+
+			switch ( type ){
+				case 'flickr':
+					url = this.getFlickrUrl();
+					data = this.getJson( url, this.buildFlickrContent, container );
+					break;
+				default:
+					console.log('content could not be loaded');
+					break;
+			}
+
+		},
+
+		getJson: function( url, fn, container ) {
+			//console.log(fn);
+			$.getJSON(url,function( data ) {
+				fn( data );
+		    })
+	   	.error(function() { console.log(" getJson error, url: " + url ); })
+		},
+
+		getFlickrUrl: function() {
+			var URL = "http://api.flickr.com/services/feeds/photos_public.gne",
+				 jsonFormat = "?format=json&jsoncallback=?",
+				 ajaxURL = URL + jsonFormat;
+			return ajaxURL;
+		},
+
+		buildFlickrContent: function( data, container ) {
+			var $container = $('#container');
+			console.log(data);
+
+			$.each(data.items,function( i, photo) {
+		    //	console.log(photo);
+		        var photoHTML = '<div class="item">';
+		        photoHTML += '<img src="' + photo.media.m + '">';
+		        $container.append(photoHTML);
+		    }); // end each
+
 
 		}
 	}
-
-	var nav = document.querySelector('nav');
-	nav.addEventListener('click', Navigation.onClick);
-
-	document.addEventListener("keydown", Navigation.onKeyDown, false);
-
-
-	Navigation.init();
-
-
- // $(window).resize(function() {
- //      updateView();
- //  });
-
-setWindowSizes()
-
 	
-	 function setWindowSizes(){
+	function setWindowSizes(){
 	 	   var window_width = $(window).width();
 	      var window_height = $(window).height();
 	      $('section').css('width', window_width + "px");
 	      $('section').css('height', window_height + "px");
-	 }
+	}
+
+
+setWindowSizes();
+
+
+var nav = document.querySelector('nav');
+nav.addEventListener('click', Navigation.onClick);
+document.addEventListener("keydown", Navigation.onKeyDown, false);
+
+Navigation.init();
+
 
 }); // on end ready
-
-
-
-/*
-jQuery(window).on('load', function() {
-
-
-	 var $container = $('#container-1');
-
-
-	var URL = "http://api.flickr.com/services/feeds/photos_public.gne";
-	var ID = "25053835@N03";
-	var jsonFormat = "?format=json&jsoncallback=?";
-	var ajaxURL = URL + jsonFormat;
-
-	$.getJSON(ajaxURL,function(data) {
-	    $('h1').text(data.title);
-
-	    $.each(data.items,function( i, photo) {
-	    	console.log(photo);
-	        var photoHTML = '<div class="item">';
-	        photoHTML += '<img src="' + photo.media.m + '" width="240">';
-	        $('#container').append(photoHTML);
-	    }); // end each
-
-	   
-	$container.masonry({
-	  columnWidth: 240,
-      gutterWidth: 15,
-	  itemSelector: '.item'
-	});
-
-	}); // end get JSON
-
-  });
-  */

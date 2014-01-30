@@ -24,6 +24,10 @@ a {
   text-decoration: none;
 }
 
+ul {
+   list-style-type: none;
+}
+
 article {
   display:block;
   position:relative;
@@ -47,8 +51,9 @@ article {
 nav li {
   position: fixed;
   color: #FFF;
-  background-color: rgb(172, 172, 172);
-  padding: 4px 14px;
+  background-color: rgb(114, 118, 228);
+  font-size:13px;
+  padding: 6px 18px;
   border-radius: 2px;
   cursor: pointer;
   z-index: 10000;
@@ -66,7 +71,7 @@ nav li.inactive, nav li.inactive:hover {
 }
 
 nav li:hover {
-  background: #CCC;
+  background: rgb(64, 68, 194);
 }
 
 #down {
@@ -87,4 +92,11 @@ nav li:hover {
 #right {
   right: 10px;
   top: 50%;
+}
+
+
+/* loaded in content */
+
+.item {
+   float:left;
 }
