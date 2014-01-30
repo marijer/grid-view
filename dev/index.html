@@ -11,25 +11,26 @@
 	
 	<div class="body-constraint">
 
-		<div id="container"></div>
-
 
 		<!-- navigation menu which is set to fixed, class to inactive so that nav buttons that are possible will 'shine' up -->
 		<nav>
-			<a href='#' id='up' class="inactive">Up</a>
-			<a href='#' id='down' class="inactive">Down</a>
-			<a href='#' id='left' class="inactive">Left</a>
-			<a href='#' id='right' class="inactive">Right</a>
+			<ul class="top_navigation">
+				<li id='up' class="inactive">Up</li>
+				<li id='down' class="inactive">Down</li>
+				<li id='left' class="inactive">Left</li>
+				<li id='right' class="inactive">Right</li>
+			</ul>
 		</nav>
 
-		<section data-column="0">
-			<article data-slide-id="0" class="active">
+		<section data-column="1">
+			<article data-slide-id="1">
 				<div class="article-container">
 					<h1>Chapter 1</h1>
+					<div class="article-content" data-content="flickr"> </div>
 				</div>
 			</article>
 
-			<article data-slide-id="1">
+			<article data-slide-id="2">
 				<div class="article-container">
 					<h1>Chapter 2</h1>				
 					<p>
@@ -38,9 +39,33 @@
 				</div>
 			</article>
 
-			<article id='test' data-slide-id="2">
+			<article id='test' data-slide-id="3">
 				<div class="article-container">
 					<h1>Chapter 3</h1>
+				</div>
+			</article>
+		</section>
+
+		<section data-column="2">
+			<article data-slide-id="1">
+				<div class="article-container">
+					<h1>Chapter 2.1</h1>
+						<div class=""
+				</div>
+			</article>
+
+			<article data-slide-id="2">
+				<div class="article-container">
+					<h1>Chapter 2.2 </h1>				
+					<p>
+						Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam id lorem ac nibh ultrices aliquam eu non lorem. Nunc a turpis vulputate, venenatis nulla nec, cursus nisi. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Praesent vulputate orci blandit, tincidunt est quis, convallis metus. Maecenas nibh lorem, vulputate nec turpis in, porttitor porttitor nibh. Mauris congue eros eu ullamcorper placerat. Nunc eleifend, nulla sit amet blandit posuere, diam odio pretium lorem, nec feugiat nulla magna ut tellus. Sed sed auctor sapien. Donec at erat vitae ipsum fringilla scelerisque.
+					</p>
+				</div>
+			</article>
+
+			<article id='test' data-slide-id="3">
+				<div class="article-container">
+					<h1>Chapter 2.3</h1>
 				</div>
 			</article>
 		</section>

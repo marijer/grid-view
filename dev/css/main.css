@@ -2,6 +2,16 @@ html {
   overflow: hidden;
 }
 
+/*experiment*/
+body {
+   width: 12000px;
+}
+
+.body-constraint section {
+   width: 1800px;
+   float:left;
+}
+
 html, body {
   height:100%;
   min-height:100%;
@@ -23,15 +33,18 @@ article {
   overflow: scroll;
 }
 
-section, .body-constraint {
+.body-constraint, section {
   width:100%;
   height:100%;
 }
 
+.article-container {
+   margin: 50px 100px;
+}
 
 /* Navigation Items */
 
-nav a {
+nav li {
   position: fixed;
   color: #FFF;
   background-color: rgb(172, 172, 172);
@@ -47,12 +60,12 @@ nav a {
   transition: .3s background ease;
 }
 
-nav a.inactive, nav a.inactive:hover {
+nav li.inactive, nav li.inactive:hover {
   cursor:default;
   background: rgb(236, 236, 236);
 }
 
-nav a:hover {
+nav li:hover {
   background: #CCC;
 }
 
