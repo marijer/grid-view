@@ -5,14 +5,13 @@ and where dynamic json data is loaded.
 
 What it currently does:
 
-I setup the grid of pages, this can be navigated through either mouse or keyboard.
-Some flickr data is loaded in on the first page, based on data attribute in the article.
+- Sets a grid of 5 * 6
+- Inserts Navigation which allows the user to navigate through the pages (either by clicking the buttons or keyboard)
+- depending on the data-content attribute, dynamic content is loaded in ( now 2 options: flickr and reddit )
 
 
-
-
-What I could focus on
-- Filling every page with random data in a cleaner method 
+Possible roadmap
+- Filling every page with data based on search in cleaner fashion 
 - responsive design
 - cleanup & comment code + error handling
 - Making use of templating system (handlebars) to avoid all repetition in index.html

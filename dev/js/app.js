@@ -132,13 +132,16 @@ $( document ).ready(function() {
 			// if page is new, insert it in the system 
 			this.loadedPages.push( gridNum );
 
-			var url,
-				 data;
+			var url;
 
 			switch ( type ){
 				case 'flickr':
 					url = this.getFlickrUrl();
-					data = this.getJson( url, this.buildFlickrContent, container );
+					this.getJson( url, this.buildFlickrContent, container );
+					break;
+				case 'reddit':
+					url = 'http://www.reddit.com/search.json?q=visualization';
+					this.getJson (url, this.buildRedditContent, container);
 					break;
 				default:
 					console.log('content could not be loaded');
@@ -148,6 +151,9 @@ $( document ).ready(function() {
 		},
 
 		getJson: function( url, fn, container ) {
+
+			$(".spinner").show();
+
 			$.getJSON(url,function( data ) {
 				fn( data, container );
 		    })
@@ -174,15 +180,36 @@ $( document ).ready(function() {
 				//stripping out img tag to get width height (ratio);
 				var result = photo.description.match( imgPattern );
 
-		      var photoHTML = '<div class="item">';
-		      photoHTML += '<div class="item-container flickr"> ' + result + '</div>';
-		      photoHTML += '</div>';
+		      var el = '<div class="item">';
+		          el += '<div class="item-container flickr"> ' + result + '</div>';
+		          el += '</div>';
 
-		      $dataContainer.append( photoHTML );
+		      $dataContainer.append( el );
 		    }); // end each
 
+			$(".spinner").hide();
 			$container.append( $dataContainer );
-		}
+		},
+
+		buildRedditContent: function( data, container ){
+			var $container = $(container).find('.article-container');
+
+			var dataContainer = document.createElement('div');
+			dataContainer.className = 'data-container';
+			var $dataContainer = $(dataContainer);
+
+		 	$.each( data.data.children.slice(0, 15), function (i, post) {
+		 		var el = '<div class="reddit-item">';
+		 			 el += '<a href="' + post.data.url + '"><h2>' + post.data.title + '</h2></a>';
+		 			 el += '<p>up: ' + post.data.ups + ' down: ' + post.data.downs + '</p>';
+                el += '</div>';
+ 				 $dataContainer.append( el );
+            });
+
+			$(".spinner").hide();
+		 	$container.append( $dataContainer );
+		},
+
 	}
 	
 	function setWindowSizes(){
@@ -190,6 +217,9 @@ $( document ).ready(function() {
 	   var window_height = $(window).height();
 	   $('section').css('width', window_width + "px");
 	   $('section').css('height', window_height + "px");
+
+	   var bodyWidth = window_width * Navigation.numColumns;
+	   $('.body-constraint').css('width', bodyWidth);
 	}
 
 
