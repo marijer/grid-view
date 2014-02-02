@@ -32,7 +32,7 @@ $( document ).ready(function() {
 			Navigation.setContent( target[0] );
 
 			target.addClass('active');
-			$('html').animate({ 
+			$('body, html').animate({ 
 							scrollTop: target.offset().top, 
 							scrollLeft: target.offset().left, 
 						},'slow');
@@ -58,17 +58,13 @@ $( document ).ready(function() {
 
 			switch (keyCode){
 				case 37:
-					pressed = "left";
-					break;
+					pressed = "left"; break;
 				case 38:
-					pressed = "up";
-					break;
+					pressed = "up"; break;
 				case 39:
-					pressed = "right";
-					break;
+					pressed = "right"; break;
 				case 40: 
-					pressed = "down";
-					break;
+					pressed = "down"; break;
 				default:
 					// some other key code we do not care about
 			}	 
@@ -127,14 +123,14 @@ $( document ).ready(function() {
 
 	var Content = {
 
-		loaded: [],
+		loadedPages: [],
 
 		setContent: function( type, container ) {
 			// saving current type so that next time it does not load it again
-			var gridNum = Navigation.posHorizontal * Navigation.posVertical;
-			if ( !this.loaded.indexOf( gridNum ) ) return false;
-			
-			this.loaded.push( gridNum );
+			var gridNum = String( Navigation.posHorizontal ) +  Navigation.posVertical;
+			if ( this.loadedPages.indexOf( gridNum ) !== -1 ) return false;
+			// if page is new, insert it in the system 
+			this.loadedPages.push( gridNum );
 
 			var url,
 				 data;
@@ -152,9 +148,8 @@ $( document ).ready(function() {
 		},
 
 		getJson: function( url, fn, container ) {
-			//console.log(fn);
 			$.getJSON(url,function( data ) {
-				fn( data );
+				fn( data, container );
 		    })
 	   	.error(function() { console.log(" getJson error, url: " + url ); })
 		},
@@ -167,25 +162,34 @@ $( document ).ready(function() {
 		},
 
 		buildFlickrContent: function( data, container ) {
-			var $container = $('#container');
-			console.log(data);
+			var $container = $(container).find('.article-container');
 
-			$.each(data.items,function( i, photo) {
-		    //	console.log(photo);
-		        var photoHTML = '<div class="item">';
-		        photoHTML += '<img src="' + photo.media.m + '">';
-		        $container.append(photoHTML);
+			var dataContainer = document.createElement('div');
+			dataContainer.className = 'data-container';
+			var $dataContainer = $(dataContainer);
+
+		   var imgPattern = /\<img .+?\/\>/ig;
+
+			$.each(data.items,function( i, photo ) {
+				//stripping out img tag to get width height (ratio);
+				var result = photo.description.match( imgPattern );
+
+		      var photoHTML = '<div class="item">';
+		      photoHTML += '<div class="item-container flickr"> ' + result + '</div>';
+		      photoHTML += '</div>';
+
+		      $dataContainer.append( photoHTML );
 		    }); // end each
 
-
+			$container.append( $dataContainer );
 		}
 	}
 	
 	function setWindowSizes(){
-	 	   var window_width = $(window).width();
-	      var window_height = $(window).height();
-	      $('section').css('width', window_width + "px");
-	      $('section').css('height', window_height + "px");
+	 	var window_width = $(window).width();
+	   var window_height = $(window).height();
+	   $('section').css('width', window_width + "px");
+	   $('section').css('height', window_height + "px");
 	}
 
 
